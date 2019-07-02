@@ -50,6 +50,5 @@ enable_kaniko = "1"
 enable_vault = "1"
 EOF
 
-./local-plan.sh
-#./local-apply.sh
-#./local-destroy.sh
+./local-apply.sh
+./local-destroy.sh
