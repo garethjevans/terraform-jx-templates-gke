@@ -1,37 +1,47 @@
 #!/usr/bin/env bash
+
 set -e
 set -x
 set -u
 
-export GH_USERNAME="jenkins-x-bot-test"
-export GH_OWNER="cb-kubecd"
+export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.key.json)"
 
-export GH_CREDS_PSW="$(jx step credential -s jenkins-x-bot-test-github)"
-export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.json)"
+PROJECT=jenkins-x-bdd2
 
-jx step git credentials
+cat <<EOF > terraform.tf
+terraform {
+  required_version = ">= 0.12.0"
+  backend "gcs" {
+    bucket      = "${PROJECT}-${VERSION}-terraform-state"
+    prefix      = "dev"
+  }
+}
+EOF
 
-# lets setup git
-git config --global --add user.name JenkinsXBot
-git config --global --add user.email jenkins-x@googlegroups.com
+cat <<EOF > terraform.tfvars
+created_by = "terraform-test"
+created_timestamp = "unknown"
+cluster_name = "${VERSION}-dev"
+organisation = "${VERSION}"
+cloud_provider = "gke"
+gcp_zone = "europe-west1-b"
+gcp_region = "europe-west1"
+gcp_project = "${PROJECT}"
+min_node_count = "3"
+max_node_count = "5"
+node_machine_type = "n1-standard-2"
+node_preemptible = "false"
+node_disk_size = "100"
+auto_repair = "true"
+auto_upgrade = "false"
+enable_kubernetes_alpha = "false"
+enable_legacy_abac = "false"
+logging_service = "logging.googleapis.com"
+monitoring_service = "monitoring.googleapis.com"
+node_devstorage_role = "https://www.googleapis.com/auth/devstorage.full_control"
+enable_kaniko = "1"
+enable_vault = "1"
+EOF
 
-JX_HOME="/tmp/jxhome"
-KUBECONFIG="/tmp/jxhome/config"
+./local-plan.sh
 
-gcloud auth activate-service-account --key-file $GKE_SA
-
-jx create terraform \
-            -c "dev=gke" \
-			--skip-login \
-			-b --install-dependencies \
-			--gke-service-account ${GKE_SA} \
-			--local-organisation-repository . \
-            --gke-zone europe-west1-c \
-            --gke-machine-type n1-standard-2 \
-            --gke-max-num-nodes 5 \
-            --gke-min-num-nodes 2 \
-            --git-username $GH_USERNAME \
-            --environment-git-owner $GH_OWNER \
-            --git-api-token $GH_CREDS_PSW \
-            --cluster terraform-$VERSION=gke \
-            --gke-project-id jenkins-x-bdd
