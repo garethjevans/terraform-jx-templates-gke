@@ -4,10 +4,10 @@ pipelineConfig:
     pullRequest:
       pipeline:
         agent:
-          image: gcr.io/jenkinsxio/builder-go:0.1.332
+          image: gcr.io/jenkinsxio/builder-terraform:0.1.332
         stages:
           - name: ci
             steps:
               - name: create-cluster-test
-                image: gcr.io/jenkinsxio/builder-go:0.1.332
+                image: gcr.io/jenkinsxio/builder-terraform:0.1.332
                 command: ./jx/scripts/ci.sh
