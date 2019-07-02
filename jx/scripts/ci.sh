@@ -26,9 +26,10 @@ terraform {
 }
 EOF
 
+DATE=$(date +%a-%b-%d-%Y-%M-%H-%S | tr '[:upper:]' '[:lower:]')
 cat <<EOF > terraform.tfvars
 created_by = "terraform-test"
-created_timestamp = "unknown"
+created_timestamp = "${DATE}"
 cluster_name = "${SAFE_VERSION}-dev"
 organisation = "${SAFE_VERSION}"
 cloud_provider = "gke"

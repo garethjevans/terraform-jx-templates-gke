@@ -96,7 +96,7 @@ resource "google_container_cluster" "jx-cluster" {
 
   resource_labels = {
     created-by = "${var.created_by}"
-    created-timestamp = "${var.created_timestamp}"
+    create-time = "${var.created_timestamp}"
     created-with = "terraform"
   }
 
