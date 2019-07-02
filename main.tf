@@ -187,10 +187,6 @@ resource "google_kms_crypto_key" "vault-crypto-key" {
   name            = "${var.cluster_name}-crypto-key"
   key_ring        = "${google_kms_key_ring.vault-keyring[0].self_link}"
   rotation_period = "100000s"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 #provider "kubernetes" {
