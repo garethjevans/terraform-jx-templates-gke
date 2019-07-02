@@ -8,9 +8,12 @@ export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.
 
 PROJECT=jenkins-x-bdd2
 
+gcloud auth activate-service-account --key-file $GKE_SA
+echo "create the bucket first"
+gsutil mb gs://${PROJECT}-${VERSION}-terraform-state
+
 terraform -version
 
-echo "TODO: should we create the bucket first"
 
 cat <<EOF > terraform.tf
 terraform {
