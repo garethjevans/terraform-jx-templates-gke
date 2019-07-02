@@ -8,6 +8,8 @@ export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.
 
 PROJECT=jenkins-x-bdd2
 
+terraform -version
+
 echo "TODO: should we create the bucket first"
 
 cat <<EOF > terraform.tf
