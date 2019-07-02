@@ -10,7 +10,7 @@ PROJECT=jenkins-x-bdd2
 BUCKET_NAME=$(echo "${PROJECT}-${VERSION}-terraform-state" | tr '[:upper:]' '[:lower:]')
 gcloud auth activate-service-account --key-file $GKE_SA
 echo "create the bucket first"
-gsutil mb gs://${BUCKET_NAME}
+gsutil mb -l EU -p ${PROJECT} gs://${BUCKET_NAME}
 
 terraform -version
 
