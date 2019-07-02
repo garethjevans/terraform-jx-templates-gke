@@ -8,6 +8,7 @@ export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.
 
 PROJECT=jenkins-x-bdd2
 BUCKET_NAME=$(echo "${PROJECT}-${VERSION}-terraform-state" | tr '[:upper:]' '[:lower:]' | sed 's/\./-/g')
+SAFE_VERSION=$(echo "v${VERSION}" | tr '[:upper:]' '[:lower:]' | sed 's/\./-/g')
 gcloud auth activate-service-account --key-file $GKE_SA
 echo "create the bucket first"
 gsutil mb -l EU -p ${PROJECT} gs://${BUCKET_NAME}
@@ -28,8 +29,8 @@ EOF
 cat <<EOF > terraform.tfvars
 created_by = "terraform-test"
 created_timestamp = "unknown"
-cluster_name = "${VERSION}-dev"
-organisation = "${VERSION}"
+cluster_name = "${SAFE_VERSION}-dev"
+organisation = "${SAFE_VERSION}"
 cloud_provider = "gke"
 gcp_zone = "europe-west1-b"
 gcp_region = "europe-west1"
