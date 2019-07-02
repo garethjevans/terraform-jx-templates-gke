@@ -8,6 +8,8 @@ export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.
 
 PROJECT=jenkins-x-bdd2
 
+echo "TODO: should we create the bucket first"
+
 cat <<EOF > terraform.tf
 terraform {
   required_version = ">= 0.12.0"
@@ -44,4 +46,5 @@ enable_vault = "1"
 EOF
 
 ./local-plan.sh
-
+#./local-apply.sh
+#./local-destroy.sh
