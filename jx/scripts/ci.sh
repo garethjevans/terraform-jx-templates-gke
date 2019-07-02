@@ -7,10 +7,10 @@ set -u
 export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.key.json)"
 
 PROJECT=jenkins-x-bdd2
-
+BUCKET_NAME=$(echo "${PROJECT}-${VERSION}-terraform-state" | tr '[:upper:]' '[:lower:]')
 gcloud auth activate-service-account --key-file $GKE_SA
 echo "create the bucket first"
-gsutil mb gs://${PROJECT}-${VERSION}-terraform-state
+gsutil mb gs://${BUCKET_NAME}
 
 terraform -version
 
@@ -19,7 +19,7 @@ cat <<EOF > terraform.tf
 terraform {
   required_version = ">= 0.12.0"
   backend "gcs" {
-    bucket      = "${PROJECT}-${VERSION}-terraform-state"
+    bucket      = "${BUCKET_NAME}"
     prefix      = "dev"
   }
 }
