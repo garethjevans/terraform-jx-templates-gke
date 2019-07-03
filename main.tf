@@ -9,43 +9,43 @@ provider "google" {
 }
 
 resource "google_project_service" "cloudresourcemanager-api" {
-  project = "${var.gcp_project}"
-  service = "cloudresourcemanager.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "compute-api" {
-  project = "${var.gcp_project}"
-  service = "compute.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "compute.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "iam-api" {
-  project = "${var.gcp_project}"
-  service = "iam.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "iam.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudbuild-api" {
-  project = "${var.gcp_project}"
-  service = "cloudbuild.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudbuild.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "containerregistry-api" {
-  project = "${var.gcp_project}"
-  service = "containerregistry.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "containerregistry.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "containeranalysis-api" {
-  project = "${var.gcp_project}"
-  service = "containeranalysis.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "containeranalysis.googleapis.com"
   disable_on_destroy = false
 }
 resource "google_project_service" "cloudkms-api" {
-  project = "${var.gcp_project}"
-  service = "cloudkms.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudkms.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -95,8 +95,8 @@ resource "google_container_cluster" "jx-cluster" {
   monitoring_service       = "${var.monitoring_service}"
 
   resource_labels = {
-    created-by = "${var.created_by}"
-    create-time = "${var.created_timestamp}"
+    created-by   = "${var.created_by}"
+    create-time  = "${var.created_timestamp}"
     created-with = "terraform"
   }
 

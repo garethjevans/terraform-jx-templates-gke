@@ -13,8 +13,11 @@ gcloud auth activate-service-account --key-file $GKE_SA
 echo "create the bucket first"
 gsutil mb -l EU -p ${PROJECT} gs://${BUCKET_NAME}
 
+echo "checking terraform version"
 terraform -version
 
+echo "checking formatting"
+terraform fmt -check
 
 cat <<EOF > terraform.tf
 terraform {
