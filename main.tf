@@ -9,43 +9,43 @@ provider "google" {
 }
 
 resource "google_project_service" "cloudresourcemanager-api" {
-  project = "${var.gcp_project}"
-  service = "cloudresourcemanager.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "compute-api" {
-  project = "${var.gcp_project}"
-  service = "compute.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "compute.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "iam-api" {
-  project = "${var.gcp_project}"
-  service = "iam.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "iam.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "cloudbuild-api" {
-  project = "${var.gcp_project}"
-  service = "cloudbuild.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudbuild.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "containerregistry-api" {
-  project = "${var.gcp_project}"
-  service = "containerregistry.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "containerregistry.googleapis.com"
   disable_on_destroy = false
 }
 
 resource "google_project_service" "containeranalysis-api" {
-  project = "${var.gcp_project}"
-  service = "containeranalysis.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "containeranalysis.googleapis.com"
   disable_on_destroy = false
 }
 resource "google_project_service" "cloudkms-api" {
-  project = "${var.gcp_project}"
-  service = "cloudkms.googleapis.com"
+  project            = "${var.gcp_project}"
+  service            = "cloudkms.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -95,8 +95,8 @@ resource "google_container_cluster" "jx-cluster" {
   monitoring_service       = "${var.monitoring_service}"
 
   resource_labels = {
-    created-by = "${var.created_by}"
-    created-timestamp = "${var.created_timestamp}"
+    created-by   = "${var.created_by}"
+    create-time  = "${var.created_timestamp}"
     created-with = "terraform"
   }
 
@@ -187,46 +187,42 @@ resource "google_kms_crypto_key" "vault-crypto-key" {
   name            = "${var.cluster_name}-crypto-key"
   key_ring        = "${google_kms_key_ring.vault-keyring[0].self_link}"
   rotation_period = "100000s"
-
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
-provider "kubernetes" {
-  host = "https://${google_container_cluster.jx-cluster.endpoint}"
-  username = "${google_container_cluster.jx-cluster.master_auth.0.username}"
-  password = "${google_container_cluster.jx-cluster.master_auth.0.password}"
-  client_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_certificate)}"
-  client_key = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_key)}"
-  cluster_ca_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.cluster_ca_certificate)}"
-}
+#provider "kubernetes" {
+#  host = "https://${google_container_cluster.jx-cluster.endpoint}"
+#  username = "${google_container_cluster.jx-cluster.master_auth.0.username}"
+#  password = "${google_container_cluster.jx-cluster.master_auth.0.password}"
+#  client_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_certificate)}"
+#  client_key = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_key)}"
+#  cluster_ca_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.cluster_ca_certificate)}"
+#}
 
-resource "kubernetes_namespace" "jx-namespace" {
-  metadata {
-    name = "jx"
-  }
-}
+#resource "kubernetes_namespace" "jx-namespace" {
+#  metadata {
+#    name = "jx"
+#  }
+#}
 
-resource "kubernetes_secret" "kaniko-secret" {
-  count = var.enable_kaniko
-  metadata {
-    name      = "kaniko-secret"
-    namespace = "jx"
-  }
+#resource "kubernetes_secret" "kaniko-secret" {
+#  count = var.enable_kaniko
+#  metadata {
+#    name      = "kaniko-secret"
+#    namespace = "jx"
+#  }
 
-  data = {
-    "credentials.json" = "${base64decode(google_service_account_key.kaniko-sa-key[0].private_key)}"
-  }
-}
+#  data = {
+#    "credentials.json" = "${base64decode(google_service_account_key.kaniko-sa-key[0].private_key)}"
+#  }
+#}
 
-resource "kubernetes_secret" "vault-secret" {
-  count = var.enable_vault
-  metadata {
-    name      = "vault-secret"
-    namespace = "jx"
-  }
-  data = {
-    "credentials.json" = "${base64decode(google_service_account_key.vault-sa-key[0].private_key)}"
-  }
-}
+#resource "kubernetes_secret" "vault-secret" {
+#  count = var.enable_vault
+#  metadata {
+#    name      = "vault-secret"
+#    namespace = "jx"
+#  }
+#  data = {
+#    "credentials.json" = "${base64decode(google_service_account_key.vault-sa-key[0].private_key)}"
+#  }
+#}

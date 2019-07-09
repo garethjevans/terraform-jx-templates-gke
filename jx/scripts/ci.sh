@@ -7,22 +7,34 @@ set -u
 export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.key.json)"
 
 PROJECT=jenkins-x-bdd2
+BUCKET_NAME=$(echo "${PROJECT}-${VERSION}-terraform-state" | tr '[:upper:]' '[:lower:]' | sed 's/\./-/g')
+SAFE_VERSION=$(echo "v${VERSION}" | tr '[:upper:]' '[:lower:]' | sed 's/\./-/g')
+gcloud auth activate-service-account --key-file $GKE_SA
+echo "create the bucket first"
+gsutil mb -l EU -p ${PROJECT} gs://${BUCKET_NAME}
+
+echo "checking terraform version"
+terraform -version
+
+echo "checking formatting"
+terraform fmt -check
 
 cat <<EOF > terraform.tf
 terraform {
   required_version = ">= 0.12.0"
   backend "gcs" {
-    bucket      = "${PROJECT}-${VERSION}-terraform-state"
+    bucket      = "${BUCKET_NAME}"
     prefix      = "dev"
   }
 }
 EOF
 
+DATE=$(date +%a-%b-%d-%Y-%M-%H-%S | tr '[:upper:]' '[:lower:]')
 cat <<EOF > terraform.tfvars
 created_by = "terraform-test"
-created_timestamp = "unknown"
-cluster_name = "${VERSION}-dev"
-organisation = "${VERSION}"
+created_timestamp = "${DATE}"
+cluster_name = "${SAFE_VERSION}-dev"
+organisation = "${SAFE_VERSION}"
 cloud_provider = "gke"
 gcp_zone = "europe-west1-b"
 gcp_region = "europe-west1"
@@ -43,5 +55,5 @@ enable_kaniko = "1"
 enable_vault = "1"
 EOF
 
-./local-plan.sh
-
+./local-apply.sh
+./local-destroy.sh
