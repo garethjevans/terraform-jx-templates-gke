@@ -103,3 +103,52 @@ variable "enable_vault" {
   description = "Enable vault for storing secrets"
   default     = "0"
 }
+
+variable "enable_boot" {
+  description = "Enable a pod to install jx using boot"
+  default     = "0"
+}
+
+variable "domain_issuer_url" {
+  default     = ""
+}
+
+variable "domain_issuer_username" {
+  default     = ""
+}
+
+variable "domain_issuer_password" {
+  default     = ""
+}
+
+variable "admin_password" {
+  default     = ""
+}
+
+variable "pipeline_github_user" {
+  default     = ""
+}
+
+variable "pipeline_github_token" {
+  default     = ""
+}
+
+variable "prow_hmac_token" {
+  default     = ""
+}
+
+variable "dashboard_auth_id" {
+  default     = ""
+}
+
+variable "dashboard_auth_secret" {
+  default     = ""
+}
+
+variable "dashboard_auth_org" {
+  default     = ""
+}
+
+variable "dashboard_grpc_host" {
+  default     = ""
+}

@@ -189,40 +189,71 @@ resource "google_kms_crypto_key" "vault-crypto-key" {
   rotation_period = "100000s"
 }
 
-#provider "kubernetes" {
-#  host = "https://${google_container_cluster.jx-cluster.endpoint}"
-#  username = "${google_container_cluster.jx-cluster.master_auth.0.username}"
-#  password = "${google_container_cluster.jx-cluster.master_auth.0.password}"
-#  client_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_certificate)}"
-#  client_key = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_key)}"
-#  cluster_ca_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.cluster_ca_certificate)}"
-#}
+provider "kubernetes" {
+  host = "https://${google_container_cluster.jx-cluster.endpoint}"
+  username = "${google_container_cluster.jx-cluster.master_auth.0.username}"
+  password = "${google_container_cluster.jx-cluster.master_auth.0.password}"
+  client_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_certificate)}"
+  client_key = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.client_key)}"
+  cluster_ca_certificate = "${base64decode(google_container_cluster.jx-cluster.master_auth.0.cluster_ca_certificate)}"
+}
 
-#resource "kubernetes_namespace" "jx-namespace" {
-#  metadata {
-#    name = "jx"
-#  }
-#}
+resource "kubernetes_namespace" "jx-namespace" {
+  metadata {
+    name = "jx"
+  }
+}
 
-#resource "kubernetes_secret" "kaniko-secret" {
-#  count = var.enable_kaniko
-#  metadata {
-#    name      = "kaniko-secret"
-#    namespace = "jx"
-#  }
-
-#  data = {
-#    "credentials.json" = "${base64decode(google_service_account_key.kaniko-sa-key[0].private_key)}"
-#  }
-#}
-
-#resource "kubernetes_secret" "vault-secret" {
-#  count = var.enable_vault
-#  metadata {
-#    name      = "vault-secret"
-#    namespace = "jx"
-#  }
-#  data = {
-#    "credentials.json" = "${base64decode(google_service_account_key.vault-sa-key[0].private_key)}"
-#  }
-#}
+resource "kubernetes_job" "jx-boot" {
+  count           = var.enable_boot
+  metadata {
+    name = "jx-boot"
+    namespace = "jx"
+  }
+  spec {
+    template {
+      metadata {}
+      spec {
+        container {
+          name    = "boot"
+          image   = "gcr.io/jenkinsxio/builder-jx:0.1.653"
+          command = ["jx"]
+          args    = ["boot", "-b", "--git-url", "https://github.com/cloudbees/arcalos-boot-config", "--git-ref", "master"]
+          env = {
+            GIT_COMMITTER_EMAIL = "jenkins-x@googlegroups.com"
+            GIT_AUTHOR_EMAIL = "jenkins-x@googlegroups.com"
+            GIT_AUTHOR_NAME = "jenkins-x-bot"
+            GIT_COMMITTER_NAME = "jenkins-x-bot"
+            JX_REQUIREMENT_TERRAFORM = "true"
+            JX_REQUIREMENT_CLUSTER_NAME = "${var.cluster_name}"
+            JX_REQUIREMENT_PROJECT = "${var.gcp_project}"
+            JX_REQUIREMENT_ZONE = "${var.gcp_zone}"
+            JX_REQUIREMENT_ENV_GIT_OWNER = "${var.git_owner}"
+            JX_REQUIREMENT_KANIKO_SA_NAME = "${var.cluster_name}-ko"
+            JX_REQUIREMENT_VAULT_SA_NAME = "${var.cluster_name}-vt"
+            JX_REQUIREMENT_EXTERNALDNS_SA_NAME = "${var.cluster_name}-dn"
+            JX_REQUIREMENT_DOMAIN_ISSUER_URL = "${var.domain_issuer_url}"
+            JX_REQUIREMENT_DOMAIN_ISSUER_USERNAME = "${var.domain_issuer_username}"
+            JX_REQUIREMENT_DOMAIN_ISSUER_PASSWORD = "${var.domain_issuer_password}"
+            JX_VALUE_ADMINUSER_PASSWORD = "${var.admin_password}"
+            JX_VALUE_PIPELINEUSER_USERNAME = "${var.pipeline_github_user}"
+            JX_VALUE_PIPELINEUSER_TOKEN = "${var.pipeline_github_token}"
+            JX_VALUE_PROW_HMACTOKEN = "${var.prow_hmac_token}"
+            JX_BATCH_MODE = "true"
+            JX_LOG_FORMAT = "json"
+            JX_VALUE_GITPROVIDER = "github"
+            JX_VALUE_DASHBOARDAUTHID = "${var.dashboard_auth_id}"
+            JX_VALUE_DASHBOARDAUTHSECRET = "${var.dashboard_auth_secret}"
+            JX_VALUE_DASHBOARDAUTHORG = "${var.dashboard_auth_org}"
+            JX_VALUE_DASHBOARDGRPCHOST = "${var.dashboard_grpc_host}"
+          }
+        }
+        restart_policy = "Never"
+        image_pull_policy = "IfNotPresent"
+      }
+    }
+    backoff_limit = 1
+    completions = 1
+    parallelism = 1
+  }
+}

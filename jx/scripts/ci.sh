@@ -4,6 +4,11 @@ set -e
 set -x
 set -u
 
+export GH_USERNAME="jenkins-x-bot-test"
+export GH_OWNER="cb-kubecd"
+
+export GH_CREDS_PSW="$(jx step credential -s jenkins-x-bot-test-github)"
+export JENKINS_CREDS_PSW="$(jx step credential -s  test-jenkins-user)"
 export GKE_SA="$(jx step credential -k bdd-credentials.json -s bdd-secret -f sa.key.json)"
 
 PROJECT=jenkins-x-bdd2
@@ -53,6 +58,7 @@ monitoring_service = "monitoring.googleapis.com"
 node_devstorage_role = "https://www.googleapis.com/auth/devstorage.full_control"
 enable_kaniko = "1"
 enable_vault = "1"
+enable_boot = "0"
 EOF
 
 ./local-apply.sh
