@@ -215,11 +215,12 @@ resource "kubernetes_job" "jx-boot" {
       metadata {}
       spec {
         container {
-          name    = "boot"
-          image   = "gcr.io/jenkinsxio/builder-jx:0.1.653"
-          command = ["jx"]
-          args    = ["boot", "-b", "--git-url", "https://github.com/cloudbees/arcalos-boot-config", "--git-ref", "master"]
-          env = {
+          name              = "boot"
+          image             = "gcr.io/jenkinsxio/builder-jx:0.1.653"
+          image_pull_policy = "IfNotPresent"
+          command           = ["jx"]
+          args              = ["boot", "-b", "--git-url", "https://github.com/cloudbees/arcalos-boot-config", "--git-ref", "master"]
+          env {
             GIT_COMMITTER_EMAIL                   = "jenkins-x@googlegroups.com"
             GIT_AUTHOR_EMAIL                      = "jenkins-x@googlegroups.com"
             GIT_AUTHOR_NAME                       = "jenkins-x-bot"
@@ -248,8 +249,7 @@ resource "kubernetes_job" "jx-boot" {
             JX_VALUE_DASHBOARDGRPCHOST            = "${var.dashboard_grpc_host}"
           }
         }
-        restart_policy    = "Never"
-        image_pull_policy = "IfNotPresent"
+        restart_policy = "Never"
       }
     }
     backoff_limit = 1
