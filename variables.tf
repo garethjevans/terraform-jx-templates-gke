@@ -110,45 +110,45 @@ variable "enable_boot" {
 }
 
 variable "domain_issuer_url" {
-  default     = ""
+  default = ""
 }
 
 variable "domain_issuer_username" {
-  default     = ""
+  default = ""
 }
 
 variable "domain_issuer_password" {
-  default     = ""
+  default = ""
 }
 
 variable "admin_password" {
-  default     = ""
+  default = ""
 }
 
 variable "pipeline_github_user" {
-  default     = ""
+  default = ""
 }
 
 variable "pipeline_github_token" {
-  default     = ""
+  default = ""
 }
 
 variable "prow_hmac_token" {
-  default     = ""
+  default = ""
 }
 
 variable "dashboard_auth_id" {
-  default     = ""
+  default = ""
 }
 
 variable "dashboard_auth_secret" {
-  default     = ""
+  default = ""
 }
 
 variable "dashboard_auth_org" {
-  default     = ""
+  default = ""
 }
 
 variable "dashboard_grpc_host" {
-  default     = ""
+  default = ""
 }
